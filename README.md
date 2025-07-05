@@ -155,8 +155,52 @@ $docker container run --network host centos:latest
 ```sh
 # you do not need to specifiy -d bridge because bridge is the default
 $ docker network create mynet -d bridge 
+$ docker network connect mynet <container-name>
+$ docker network disconnect mynet <container-name>
+#containers connected in the same network can send to each other data 
+#by name and ip and can 
+# bridge network but cannot connect to the internet or the outside world
+$ docker network create --internal mynet 
 
 ```
+#### default bridge vs the bridge (user created)
+#### bothe access internet but default can only communicate to another container
+#### by the ip address only on the other hand created bridge can communicate to 
+#### another container by name and ip
+#### both need port maping for access them
+
+
+## Docker volumns
+
+```sh
+# the -v will live see the content of the code folder on your local machine
+# and copy any change in the container always (real time copy)
+$ docker container run -it -v home/girgis/docker-work/code:/app/code python
+
+#import os
+#os.listdir('/app/code')
+
+# but if i want to make 10 container and all of them see the code folder
+# it will be so hard to each tome write the full path and the container
+# path the best solution is to create a volum for that
+
+$ docker volume create myvol
+$ docker container run -it -v myvol:/app/code python
+
+# Create the named volume
+$ docker volume create myvol
+
+# Copy files from /home/girgis/mycode to myvol
+$ docker container run --rm -v myvol:/app/mycode -v /home/girgis/mycode:/source alpine sh -c "cp -r /source/* /app/mycode/"
+
+
+
+
+
+
+
+```
+
 
 
 
