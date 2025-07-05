@@ -1,7 +1,7 @@
 # Docker most used Commands
 
 
-##docker
+## docker
 ```sh
 $docker --version
 $docker info
@@ -13,7 +13,7 @@ $sudo usermod -aG docker $USER_NAME
 ```
 
 
-##image
+## image
 ```sh
 #List all images
 $ docker image ls
@@ -38,7 +38,7 @@ During the `$ docker image build` and for each instruction in the Dockerfile, Do
 
 ```
 
-##container
+## container
 ```sh
 #Ctrl-PQ // will detach your shell from the terminal of a container and leave the container running (UP) in the background.
 # lists all containers in the running (UP). 
