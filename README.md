@@ -201,6 +201,14 @@ $ docker container run --rm -v myvol:/app/mycode -v /home/girgis/mycode:/source 
 ```sh
 $docker build -t girgisemad/myapp:latest .
 ```
+## docker-compose.yml
+
+```sh
+$ docker-compose up #here you can write specific service if you need
+$ docker-compose down 
+$docker-compose -f differentname-docker-compose.yml up
+
+```
 
 
 
