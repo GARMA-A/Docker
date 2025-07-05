@@ -5,6 +5,8 @@
 ```sh
 $docker --version
 $docker info
+$docker image history nginx:latest
+$docker image inspect <image-name>:<tag>
 
 $groups
 $sudo usermod -aG docker $USER_NAME
@@ -67,6 +69,7 @@ $docker container inspect
 # start new containers.
 $ docker container run 
 
+
 #Launch a container from an image
 #--i interactive mode --t terminal mode 
 #/bin/bash to run a bash shell inside the container
@@ -83,6 +86,13 @@ $ curl -X POST -H \
 "Content-Type: application/json" \
 -d '{"name":"John"}' https://api.example.com/users
 
+#hadoop.asam17/hadoop-pseudo:v1.0 is the image name
+# -c option to run a command inside the container
+$ docker container run  hadoop.asam17/hadoop-pseudo:v1.0 bash -c "/usr/local/bootstrap.sh; bash"
+
+# -e is to add environment variable
+$docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd" -e "MSSQL_PID=Express" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+
 #Stop a running container
 $ docker container stop <containername>
 
@@ -92,6 +102,59 @@ $ docker container start <containername>
 #Delete a stopped container
 $ docker container rm <containername>
 $ docker container run -d -p 8080:80 nginx:latest
+
+```
+
+## docker workflow
+
+```sh
+## bad workflow
+# you develop you application and copy the src code into the container
+$ docker cp <source-path> <container-name-or-id>:<destination-path>
+
+# the following command copy the `test.txt` file to the container
+$ docker container cp ./test.txt 7e0:/tmp/test.txt
+
+
+
+```
+
+## network default problems
+```sh
+##Example 1
+$docker container run -d --name web nginx:latest
+$docker container run -it --name client centos:latest
+#indide centos container
+$ curl http://web
+#could not resolve host: web
+#but if i didi the following command
+$docker container inspect web
+#search for ip address for example 172.17.0.2
+$ping 172.17.0.2
+#it works from client ping to web 
+
+# how to make containers comunicate using names 
+# first solution
+$docker container run -it --name client --add-host web:172.17.0.2 centos:latest
+
+#to show docker ip address
+$ip addr show
+
+# --network to choice a network none mean the container will not have any network
+# mean it cannot send or recive any thing from host or anoher container
+$docker container run --network none centos:latest
+
+# --network host to use the host network
+$docker container run --network host centos:latest
+
+# drivers network bridge macvlan overlay for multiple hosts
+
+```
+
+## docker networks
+```sh
+# you do not need to specifiy -d bridge because bridge is the default
+$ docker network create mynet -d bridge 
 
 ```
 
