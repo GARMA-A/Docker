@@ -6,7 +6,8 @@
 $docker --version
 $docker info
 
-
+$groups
+$sudo usermod -aG docker $USER_NAME
 ```
 
 
@@ -70,6 +71,17 @@ $ docker container run
 #--i interactive mode --t terminal mode 
 #/bin/bash to run a bash shell inside the container
 $ docker container run -it ubuntu:latest /bin/bash
+# example 
+# the --name for the container is useful for replacing the id and -h for rename the 
+# operating system inside the contaoner
+$ docker container run -it --name "anyname" -h "anyhostname" -p 8080:80 nginx:latest /bin/bash
+$ docker container run -d -p 8080:80 nginx:latest
+$ curl http://localhost:8080
+
+# full example of curl command
+$ curl -X POST -H \
+"Content-Type: application/json" \
+-d '{"name":"John"}' https://api.example.com/users
 
 #Stop a running container
 $ docker container stop <containername>
