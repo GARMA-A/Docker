@@ -193,12 +193,13 @@ $ docker volume create myvol
 # Copy files from /home/girgis/mycode to myvol
 $ docker container run --rm -v myvol:/app/mycode -v /home/girgis/mycode:/source alpine sh -c "cp -r /source/* /app/mycode/"
 
+```
 
 
+## Dockerfile
 
-
-
-
+```sh
+$docker build -t girgisemad/myapp:latest .
 ```
 
 

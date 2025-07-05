@@ -1,0 +1,85 @@
+# Define services (containers) that make up your application.
+services:
+  # Service 1: Python backend (e.g., Flask or Django application)
+  backend:
+    # Use an official Python image; specify a version for consistency.
+    image: python:3.11
+    # Build from a Dockerfile in the current directory (uncomment if using a custom image).
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    # Container name for easier reference.
+    container_name: myapp-backend
+    # Command to run when the container starts (e.g., start a Python app).
+    command: python /app/mycode/app.py
+    # Bind mount the local code directory for real-time updates.
+    # Maps ./mycode (host) to /app/mycode (container).
+    volumes:
+      - ./mycode:/app/mycode
+    # Environment variables for the backend service.
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/mydb
+      - APP_ENV=development
+    # Map ports (host:container) to access the app from the host.
+    # E.g., access the app at http://localhost:8000.
+    ports:
+      - "8000:8000"
+    # Ensure the backend starts after the database is ready.
+    depends_on:
+      - db
+    # Connect to the custom network for service communication.
+    networks:
+      - myapp-network
+    # Restart policy (e.g., restart on failure).
+    restart: unless-stopped
+
+  # Service 2: PostgreSQL database
+  db:
+    # Use an official PostgreSQL image.
+    image: postgres:15
+    container_name: myapp-db
+    # Environment variables for PostgreSQL configuration.
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mydb
+    # Use a named volume for persistent database data.
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    # Expose the database port (optional, for external tools).
+    # Comment out if only accessed within the network.
+    ports:
+      - "5432:5432"
+    networks:
+      - myapp-network
+    restart: unless-stopped
+
+  # Service 3: Nginx web server (e.g., for serving static files or proxying)
+  web:
+    image: nginx:alpine
+    container_name: myapp-web
+    # Mount a custom Nginx configuration file from the host.
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    # Map port 80 on the host to 80 in the container.
+    ports:
+      - "80:80"
+    # Depend on the backend to ensure it’s running.
+    depends_on:
+      - backend
+    networks:
+      - myapp-network
+    restart: unless-stopped
+
+# Define named volumes for persistent data.
+volumes:
+  # Named volume for PostgreSQL data, persists across container restarts.
+  db-data:
+    name: myapp-db-data
+
+# Define a custom network for service communication.
+networks:
+  # User-defined bridge network for inter-service communication.
+  # Containers can communicate using service names (e.g., backend, db).
+  myapp-network:
+    driver: bridge
