@@ -1,0 +1,128 @@
+# Use an official base image from Docker Hub or another registry
+
+# Example: Using Ubuntu 20.04 as the base image for flexibility
+FROM ubuntu:20.04
+
+# Set the maintainer information for the Docker image
+# This is useful for documentation and contact purposes
+LABEL maintainer="Your Name <your.email@example.com>"
+
+# Add metadata labels for better image management
+# Labels provide information about the image, such as version or description
+LABEL version="1.0"
+LABEL description="A comprehensive Dockerfile template with commonly used commands"
+
+# Set environment variables to configure the container
+# ENV sets variables that persist in the running container
+ENV APP_HOME=/app \
+    PORT=8080 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Copy files from the host to the container's filesystem
+# COPY is used to transfer files or directories into the image
+COPY . /app
+
+# Alternative to COPY, ADD can handle URLs and tar auto-extraction
+# Example: Adding a tar.gz file that will be automatically extracted
+ADD app.tar.gz /app
+
+# Set the working directory for subsequent instructions
+# All following commands (RUN, CMD, ENTRYPOINT, etc.) will execute in this directory
+WORKDIR /app
+
+# Run commands during the image build process
+# RUN executes commands in a new layer and commits the results
+# Example: Updating package lists and installing dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    python3 \
+    python3-pip \
+    nodejs \
+    npm \
+    curl \
+    git \
+    && apt-get clean
+
+# Install Python dependencies from a requirements file
+# Example: Assuming a requirements.txt file exists in the project
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Expose a port to allow external access to the container
+# EXPOSE documents which ports the container will listen on
+EXPOSE $PORT
+
+# Define volumes to persist data or share with the host
+# Volumes allow data to persist beyond the container's lifecycle
+VOLUME /app/data
+
+# Set a healthcheck to monitor the container's health
+# HEALTHCHECK ensures the container is running correctly
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl -f http://localhost:$PORT/health || exit 1
+
+# Specify the user to run the container
+# USER changes the user for subsequent RUN, CMD, and ENTRYPOINT instructions
+# Example: Create a non-root user for security
+RUN useradd -m appuser
+USER appuser
+
+# Set the default command to execute when the container starts
+# CMD provides defaults for an executing container
+# Can be overridden when running the container
+CMD ["python3", "app.py"]
+
+# Alternative to CMD, ENTRYPOINT sets a fixed command that cannot be easily overridden
+# Useful for setting up a container as an executable
+# Example: Running a Node.js application
+# ENTRYPOINT ["node", "server.js"]
+
+# Use a multi-stage build to reduce final image size
+# Example: First stage to build an application
+FROM node:16 AS builder
+WORKDIR /build
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Second stage: Copy only the necessary artifacts from the builder stage
+FROM node:16-slim
+WORKDIR /app
+COPY --from=builder /build/dist ./dist
+COPY package*.json ./
+RUN npm install --production
+
+# Set a shell to run the container
+# SHELL changes the default shell for RUN, CMD, and ENTRYPOINT
+SHELL ["/bin/bash", "-c"]
+
+# Example: Run multiple commands in a single RUN to reduce layers
+RUN echo "Building the application..." && \
+    npm ci && \
+    echo "Build complete."
+
+# Example: Install additional tools conditionally
+ARG INSTALL_TOOLS=false
+RUN if [ "$INSTALL_TOOLS" = "true" ]; then \
+        apt-get update && \
+        apt-get install -y vim nano; \
+    fi
+
+# Example: Configure a startup script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Use ENTRYPOINT with a script for flexible startup
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Provide a default command for the ENTRYPOINT
+CMD ["start"]
+
+# Example: Set up a healthcheck with a custom script
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /healthcheck.sh
+HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 \
+    CMD /healthcheck.sh
+
+# Clean up to reduce image size
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
