@@ -1,0 +1,110 @@
+#Yaml is a superset of JSON, so you can use JSON syntax in YAML files
+#This is a comment in YAML
+#YAML is a human-readable data serialization format
+#YAML is often used for configuration files and data exchange between languages 
+#with different data structures
+
+name: Ahmed # this is a string 
+
+age: 30 # this is an integer
+
+is_student: false # this is a boolean
+
+salary: 50000.50 # this is a float
+
+eployment_date: 2023-10-01T14:30:00Z # this is a date in ISO 8601 format
+
+serial_numebr: "001234567890" # this is a string with leading zeros
+
+regex: "^[a-zA-Z0-9]{10}$" # this is a regular expression
+
+message: 'hello\nworld' # this value will be hello\nworld literal 
+
+path: "C:\\Users\\Ahmed\\Documents" # this is a Windows file path
+#we escape the \ with another \
+
+s_quote: 'Its''YAML' # this is a single quoted string with an escaped single quote
+
+multi_line_string: |
+  This is a multi-line string.
+  It can span multiple lines.
+  Each line will be preserved as is.
+
+single_line_string: >
+  This is a single-line string.
+  It will be folded into a single line.
+  Newlines will be replaced with spaces.
+
+# This is a map (dictionary) with various data types
+employee_map:
+  name: "John Doe"
+  age: 28
+  salary: 60000.75
+  employment_date: 2022-05-15T09:00:00Z
+  regex: "^[a-zA-Z0-9]{10}$"
+  contact:
+    email: "John@gmail.com"
+    phone: "+1234567890"
+
+# This is a list of  maps 
+list_of_emplyees:
+  - name: "Alice Smith"
+    age: 25
+    salary: 55000.00
+    employment_date: 2021-03-10T08:30:00Z
+    regex: "^[a-zA-Z0-9]{10}$"
+    contact:
+      email: "anything"
+      phone: "+0987654321"
+
+  - name: "Bob Johnson"
+    age: 32
+    salary: 70000.00
+    employment_date: 2020-11-20T10:15:00Z
+    regex: "^[a-zA-Z0-9]{10}$"
+    contact:
+      email: "anything"
+      phone: "+1122334455"
+
+
+# this is map of list
+servers:
+   production:
+    - host: "prod.example.com"
+      port: 443
+      protocol: "https"
+
+    - host: "prod2.example.com"
+      port: 80
+      protocol: "http"
+
+   staging:
+    - host: "staging.example.com"
+      port: 8080
+      protocol: "http"
+
+   development:
+    - host: "dev.example.com"
+      port: 3000
+      protocol: "http"
+
+    - host: "dev2.example.com"
+      port: 5000
+      protocol: "http"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
