@@ -1,0 +1,36 @@
+name: Build and API Check
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Start server in background
+        run: |
+          nohup npm start &
+          sleep 10  # Wait for server to start
+
+      - name: Check API endpoints
+        run: |
+          curl -f http://localhost:3000/api/endpoint1
+          curl -f http://localhost:3000/api/endpoint2
+          # Add more endpoints as needed
