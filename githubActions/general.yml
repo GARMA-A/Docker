@@ -1,0 +1,58 @@
+name: General Workflow Showcase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  showcase:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run a shell command
+        run: echo "Hello, World!"
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+
+      - name: Conditional step
+        if: success()
+        run: echo "Previous steps succeeded"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: path/to/artifact
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: my-artifact
+
+      # Additional options:
+      # - Use different runners: runs-on: [self-hosted, linux, x64]
+      # - Set environment variables: env: { KEY: value }
+      # - Use secrets: ${{ secrets.MY_SECRET }}
+      # - Run on multiple OS: runs-on: ${{ matrix.os }}, matrix: { os: [ubuntu-latest, windows-latest, macos-latest] }
+      # - Use continue-on-error: true to continue even if a step fails
+      # - Set timeouts: timeout-minutes: 10
+      # - Use with parameters for actions: with: { param: value }
