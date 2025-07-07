@@ -1,0 +1,27 @@
+FROM golang:1.20-alpine
+
+WORKDIR /src
+
+RUN apk add --no-cache git
+
+COPY version.txt .
+
+RUN --mount=type=cache,target=/go/pkg/mod/cache \
+    --mount=type=bind,source=./go.mod,target=/src/go.mod \
+    --mount=type=bind,source=./go.sum,target=/src/go.sum \
+    go mod download
+
+RUN --mount=type=tmpfs,target=/tmp/build \
+    mkdir -p /tmp/build && touch /tmp/build/placeholder
+
+RUN --mount=type=secret,id=mysecret,target=/run/secrets/api_key \
+    echo "Secret used: $(cat /run/secrets/api_key)" > /dev/null
+
+RUN --mount=type=ssh \
+    ssh -o StrictHostKeyChecking=no git@example.com || true
+
+COPY . .
+
+RUN go build -o /bin/app
+
+CMD ["sh", "-c", "/bin/app"]
