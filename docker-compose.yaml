@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+        - path: ./frontend/src
+          target: /app/src
+          action: sync
+        - path: ./frontend/package.json
+          action: rebuild
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    develop:
+      watch:
+        - path: ./backend/src
+          target: /app/src
+          action: sync
+        - path: ./backend/package.json
+          action: rebuild
